@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const { login } = useAuth();
   const router = useRouter();
+  console.log("Backend URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
