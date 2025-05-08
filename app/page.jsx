@@ -1,70 +1,100 @@
 'use client';
-import { useAuth } from '../context/AuthContext';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import PhotoCard from './components/PhotoCard';
+import UploadForm from './components/UploadForm';
+import LeftSidebar from './components/LeftSidebar';
+import RightSidebar from './components/RightSidebar';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // ✅ Correct import for App Router
-import { useState, useEffect } from 'react';
 
-export default function HomePage() {
-  const { user, logout } = useAuth();
+export default function ConsumerPage() {
+  const { user } = useAuth();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showUploadForm, setShowUploadForm] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-
-    // If user is not logged in, redirect to login
     if (!user) {
       router.push('/login');
     }
   }, [user, router]);
 
-  if (!mounted || !user) {
-    return null; // Don't render until mounted and user is available
-  }
+  useEffect(() => {
+    if (user) {
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/photos`)
+        .then((res) => res.json())
+        .then((data) => {
+          setPhotos(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error('Error fetching photos:', err);
+          setLoading(false);
+        });
+    }
+  }, [user]);
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login'); // Optional: redirect after logout
-  };
+  if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-r from-blue-500 to-green-500 text-white flex flex-col justify-center items-center p-6">
-      <header className="w-full flex justify-between items-center mb-10">
-        <h1 className="text-5xl font-extrabold">PhotoShare</h1>
-        {user && (
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 px-4 py-2 rounded-lg text-white font-medium hover:bg-red-700 transition duration-300"
-          >
-            Logout
-          </button>
-        )}
-      </header>
-
-      <section className="text-center max-w-4xl mx-auto">
-        <h2 className="text-4xl font-bold mb-8">Welcome to PhotoShare!</h2>
-        <div className="flex justify-center space-x-8">
-          {/* Check if user is Admin */}
-          {user.role === 'admin' && (
-            <>
-              <Link
-                href="/creator"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg text-xl font-semibold hover:bg-blue-700 transition duration-300"
-              >
-                Creator View
-              </Link>
-            </>
+    <div className="min-h-screen bg-gray-100 pt-20">
+      {/* Top Nav */}
+      <div className="bg-white border-b border-gray-200 py-4 px-6 flex justify-between items-center fixed top-0 left-0 right-0 z-10">
+        <Link href="/" className="text-2xl font-bold text-gray-800 hover:text-gray-600">
+          PhotoShare
+        </Link>
+        <div className="flex space-x-4">
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setShowUploadForm((prev) => !prev)}
+              className="text-sm font-semibold px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Post
+            </button>
           )}
-          
-          {/* Consumer View is always visible */}
-          <Link
-            href="/consumer"
-            className="bg-green-600 text-white px-6 py-3 rounded-lg text-xl font-semibold hover:bg-green-700 transition duration-300"
-          >
-            Consumer View
-          </Link>
         </div>
-      </section>
-    </main>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {/* Left Sidebar */}
+        <div className="hidden md:block md:col-span-1">
+          <LeftSidebar />
+        </div>
+
+        {/* Main Feed */}
+        <div className="col-span-1 md:col-span-2 lg:col-span-3 px-4">
+          <header className="mb-6 text-center">
+            <h2 className="text-3xl font-bold text-gray-800">Explore Stunning Photos</h2>
+            <p className="text-sm text-gray-500">Browse beautiful images shared by our community</p>
+          </header>
+          <div className="flex justify-center">
+            <div className="w-full max-w-xl px-4">
+              {/* UploadForm renders here */}
+              {user?.role === 'admin' && showUploadForm && <UploadForm />}
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="animate-spin rounded-full border-t-4 border-blue-500 h-12 w-12"></div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {photos.map((photo) => (
+                <PhotoCard key={photo.id} photo={photo} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="hidden lg:block lg:col-span-1">
+          <RightSidebar />
+        </div>
+      </div>
+    </div>
   );
 }

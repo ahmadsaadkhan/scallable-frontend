@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 export default function CommentBox({ photoId, onCommentAdded }) {
   const [comment, setComment] = useState('');
-  const [rating, setRating] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -11,8 +10,8 @@ export default function CommentBox({ photoId, onCommentAdded }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!comment || !rating) {
-      setError('Both comment and rating are required');
+    if (!comment.trim()) {
+      setError('Comment is required.');
       return;
     }
 
@@ -26,22 +25,15 @@ export default function CommentBox({ photoId, onCommentAdded }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          photoId,
-          comment,
-          rating: parseInt(rating),
-        }),
+        body: JSON.stringify({ photoId, comment }),
       });
 
       if (!response.ok) throw new Error('Failed to submit comment');
 
-      setSuccess('Comment submitted successfully!');
+      setSuccess('Comment submitted!');
       setComment('');
-      setRating('');
 
-      if (onCommentAdded) {
-        onCommentAdded(); // ✅ Call to refresh comments
-      }
+      if (onCommentAdded) onCommentAdded();
     } catch (err) {
       setError('Error submitting comment: ' + err.message);
     } finally {
@@ -50,34 +42,27 @@ export default function CommentBox({ photoId, onCommentAdded }) {
   };
 
   return (
-    <div className="mt-4">
+    <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
       <textarea
-        className="w-full p-2 border rounded mb-2"
-        placeholder="Leave a comment..."
+        className="w-full p-3 border text-black border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+        rows="3"
+        placeholder="Add a comment..."
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       ></textarea>
 
-      <input
-        type="number"
-        min="1"
-        max="5"
-        className="w-full p-2 border rounded mb-2"
-        placeholder="Rate 1-5"
-        value={rating}
-        onChange={(e) => setRating(e.target.value)}
-      />
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300"
+        >
+          {loading ? 'Submitting...' : 'Post'}
+        </button>
+      </div>
 
-      <button
-        onClick={handleSubmit}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-        disabled={loading}
-      >
-        {loading ? 'Submitting...' : 'Submit'}
-      </button>
-
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-      {success && <p className="text-green-500 mt-2">{success}</p>}
-    </div>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {success && <p className="text-green-600 text-sm">{success}</p>}
+    </form>
   );
 }

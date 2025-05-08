@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function UploadForm() {
   const { user } = useAuth();
@@ -46,41 +46,44 @@ export default function UploadForm() {
   };
 
   return (
-    <div className="w-full max-w-xl bg-white p-6 rounded-lg shadow-md mb-10">
-      <h3 className="text-2xl font-bold mb-4 text-center text-gray-800">Create a New Post</h3>
+    <div className="bg-white p-4 rounded-md shadow-sm mb-8 border border-gray-200">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Image</label>
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">Create New Post</h3>
+
+        <div className="flex flex-col">
+          <label className="text-sm text-gray-600 mb-1">Choose an image</label>
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
             required
-            className="mt-1 block w-full text-sm file:px-4 file:py-2 file:border file:border-gray-300 file:rounded-md file:bg-gray-100 hover:file:bg-gray-200"
+            className="text-sm file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
           />
         </div>
 
-        {['title', 'caption', 'location', 'people'].map((field) => (
-          <div key={field}>
-            <label htmlFor={field} className="block text-sm font-medium text-gray-700">
-              {field.charAt(0).toUpperCase() + field.slice(1)}
-            </label>
-            <input
-              id={field}
-              name={field}
-              value={formData[field]}
-              onChange={handleChange}
-              required
-              className="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-        ))}
+        <div className="grid grid-cols-2 gap-4">
+          {['title', 'caption', 'location', 'people'].map((field) => (
+            <div key={field}>
+              <label htmlFor={field} className="block text-xs text-gray-500 mb-1">
+                {field.charAt(0).toUpperCase() + field.slice(1)}
+              </label>
+              <input
+                id={field}
+                name={field}
+                value={formData[field]}
+                onChange={handleChange}
+                required
+                className="w-full p-2 text-sm border text-black border-gray-300 rounded focus:ring-1 focus:ring-indigo-400"
+              />
+            </div>
+          ))}
+        </div>
 
         <button
           type="submit"
-          className="w-full py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
+          className="w-full py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700"
         >
-          Upload
+          Post
         </button>
       </form>
     </div>

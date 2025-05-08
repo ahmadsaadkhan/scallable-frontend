@@ -3,15 +3,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { loginUser } from '../../lib/auth';
-import { Mail, Lock } from 'lucide-react'; // Assuming you're using lucide icons
+import { FaFacebookSquare } from 'react-icons/fa';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuth();
   const router = useRouter();
-  console.log("Backend URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
-  console.log("Backend URL:", process.env.test);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,42 +23,58 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md transform transition duration-300 hover:scale-[1.02]">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Welcome Back</h2>
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 text-gray-400" />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-10 px-4">
+      <div className="w-full max-w-sm">
+        <div className="bg-white border border-gray-300 rounded-md px-8 py-10 text-center shadow-sm">
+          <h1 className="text-4xl font-bold mb-8 font-sans text-gray-800 tracking-wide">PhotoShare</h1>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Phone number, username, or email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
               required
             />
-          </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 text-gray-400" />
             <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
               required
             />
+            <button
+              type="submit"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md font-semibold text-sm transition duration-200"
+            >
+              Log In
+            </button>
+          </form>
+
+          <div className="my-4 flex items-center justify-center text-gray-400 text-xs">
+            <div className="border-t border-gray-300 w-1/4"></div>
+            <span className="px-2">OR</span>
+            <div className="border-t border-gray-300 w-1/4"></div>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md font-semibold transition duration-200"
-          >
-            Sign In
+
+          <button className="flex items-center justify-center space-x-2 text-blue-900 font-medium text-sm mb-3">
+            <FaFacebookSquare size={18} />
+            <span>Log in with Facebook</span>
           </button>
-        </form>
-        <p className="text-sm text-gray-500 text-center mt-4">
-          Don't have an account? <a href="/register" className="text-indigo-600 hover:underline">Register</a>
-        </p>
+
+          <a href="#" className="text-xs text-blue-900 hover:underline">
+            Forgotten your password?
+          </a>
+        </div>
+
+        <div className="bg-white text-black border border-gray-300 rounded-md px-6 py-4 mt-4 text-center text-sm">
+          Don't have an account?{' '}
+          <a href="/register" className="text-blue-500 font-semibold hover:underline">
+            Sign up
+          </a>
+        </div>
       </div>
     </div>
   );
